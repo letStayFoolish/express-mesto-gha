@@ -14,9 +14,16 @@ function getUser(req, res) {
         res.status(404).send({ message: `Пользователь по указанному id: ${userId}.` });
         return;
       }
+
       res.status(200).send(user);
     })
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}.` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Указан некорректный id.' });
+        return;
+      }
+      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+    });
 }
 // Create new user:
 function createUser(req, res) {

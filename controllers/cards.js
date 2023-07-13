@@ -53,6 +53,7 @@ function likeCard(req, res) {
       res.status(500).send({ message: `Произошла ошибка ${err}.` });
     });
 }
+
 // Delete likes
 function dislikeCard(req, res) {
   const { cardId } = req.params;
