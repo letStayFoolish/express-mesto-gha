@@ -103,6 +103,11 @@ function updateAvatar(req, res) {
       res.status(500).send({ message: `Произошла ошибка ${err}.` });
     });
 }
+
+function uncorrectedURL(req, res) {
+  // Uncorrected route while patching data
+  res.status(404).send({ message: 'Указан некорректный путь в URL адресе' });
+}
 // Export
 module.exports = {
   getUsers,
@@ -110,4 +115,5 @@ module.exports = {
   createUser,
   updateUser,
   updateAvatar,
+  uncorrectedURL,
 };

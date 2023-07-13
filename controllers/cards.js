@@ -100,7 +100,7 @@ function dislikeCard(req, res) {
         return;
       }
       // Status 201:
-      res.status(201).send(card);
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
