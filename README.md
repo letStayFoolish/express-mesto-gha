@@ -28,20 +28,26 @@ CARD:
 
 
 
-[//]: # (<hr>)
+<hr>
 
-[//]: # (## Screenshots)
+## Screenshots (from Postman)
 
-[//]: # (<img src="" width="100%">)
+<img src="./assets/01-getUsers.png" alt="Screenshot image taken from software - Postman." width="100%">
 
-[//]: # (<details><summary><b>Show all</b></summary>)
+<details><summary><b>Show all</b></summary>
+<img src="./assets/02-getUser.png" width="500px">
 
-[//]: # (<img src="" width="100%">)
+<img src="./assets/03-createUser.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/04-updateUser.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/05-updateAvatar.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/06-getCards.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/07-createCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/08-deleteCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/09-likeCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+<img src="./assets/10-dislikeCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+</details>
 
-[//]: # ()
-[//]: # (</details>)
-
-[//]: # (<hr>)
+<hr>
 
 ## Technologies Used
 
