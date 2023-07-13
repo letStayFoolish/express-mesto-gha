@@ -47,61 +47,61 @@ CARD:
   </figcaption>
 </figure>
 <figure>
-  <img src="./assets/02-getUser.png" width="500px">
+  <img src="./assets/02-getUser.png" width="100%">
   <figcaption>
     Postman: GET one user according ID request example
   </figcaption>
 </figure>
 <figure>
-  <img src="./assets/03-createUser.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/03-createUser.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: POST create new user request example
   </figcaption>
 </figure>
 <figure>
-  <img src="./assets/04-updateUser.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/04-updateUser.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: PATCH update user's info request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/05-updateAvatar.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/05-updateAvatar.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: PATCH update user's avatar request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/06-getCards.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/06-getCards.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: GET all cards request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/07-createCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/07-createCard.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: POST create new card request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/08-deleteCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/08-deleteCard.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: DELETE remove card request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/09-likeCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/09-likeCard.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: PATCH put likes on card request example
   </figcaption>
 </figure>
 
 <figure>
-  <img src="./assets/10-dislikeCard.png" alt="Screenshot image taken from software - Postman." width="500px">
+  <img src="./assets/10-dislikeCard.png" alt="Screenshot image taken from software - Postman." width="100%">
   <figcaption>
     Postman: DELETE dislike card request example
   </figcaption>
