@@ -38,6 +38,7 @@ CARD:
   </figcaption>
 </figure>
 
+
 <details><summary><b>Show all</b></summary>
 <figure>
   <img src="./assets/01-getUsers.png" alt="Screenshot image taken from software - Postman." width="100%">
