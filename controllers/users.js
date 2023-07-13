@@ -1,11 +1,17 @@
 const User = require('../models/user');
+const {
+  BAD_REQUEST,
+  REQUEST_NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} = require('../error_handlers/errors-constantes');
+
 // Read ALL users:
 function getUsers(req, res) {
   return User.find({})
     // Status 200:
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     // Status 500 - Default
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}.` }));
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' }));
 }
 // Read ONE user:
 function getUser(req, res) {
@@ -14,20 +20,20 @@ function getUser(req, res) {
     .then((user) => {
       if (!user) {
         // Status 404:
-        res.status(404).send({ message: `Пользователь по указанному id: ${userId} не найден..` });
+        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден..` });
         return;
       }
       // Status 200:
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        res.status(400).send({ message: 'Указан некорректный id.' });
+        res.status(BAD_REQUEST).send({ message: 'Указан некорректный id.' });
         return;
       }
       // Status 500 - Default:
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 // Create new user:
@@ -39,13 +45,13 @@ function createUser(req, res) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         // Status 400:
-        res.status(400).send({
+        res.status(BAD_REQUEST).send({
           message: 'Переданы некорректные данные при создании пользователя.',
         });
         return;
       }
       // Status 500 - Default
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 // Update user's info:
@@ -55,29 +61,25 @@ function updateUser(req, res) {
     about: req.body.about,
   };
   const id = req.user._id;
-  return User.findByIdAndUpdate(id, uData, { new: true })
+  return User.findByIdAndUpdate(id, uData, { new: true, runValidators: true })
     .then((user) => {
-      // Status 400:
-      if (!user || (uData.name && (uData.name.length < 2 || uData.name.length > 30))) {
-        res.status(400)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля. ' });
-        return;
-      }
-      if (!user || (uData.about && (uData.about.length < 2 || uData.about.length > 30))) {
-        res.status(400)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля. ' });
+      // Status 404
+      if (!user) {
+        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь с указанным id: ${id} не найден.` });
         return;
       }
       // Status 200:
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
+      // Status 400:
       if (err.name === 'ValidationError') {
-        // Status 404
-        res.status(404).send({ message: `Пользователь с указанным id: ${id} не найден.` });
+        res.status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        return;
       }
       // Status 500 - Default:
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 // Update user's avatar:
@@ -86,28 +88,27 @@ function updateAvatar(req, res) {
     avatar: req.body.avatar,
   };
   const id = req.user._id;
-  return User.findByIdAndUpdate(id, uData, { new: true })
+  return User.findByIdAndUpdate(id, uData, { new: true, runValidators: true })
     .then((user) => {
-      // Status 400:
-      if (!user || !uData.avatar || uData.avatar === '') {
-        res.status(400)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля. ' });
+      // Status 404
+      if (!user) {
+        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь с указанным id: ${id} не найден.` });
         return;
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
+      // Status 400:
       if (err.name === 'ValidationError') {
-        res.status(404).send({ message: `Пользователь с указанным id: ${id} не найден.` });
+        res.status(BAD_REQUEST)
+          .send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        return;
       }
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      // Status 500 - Default:
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 
-function uncorrectedURL(req, res) {
-  // Uncorrected route while patching data
-  res.status(404).send({ message: 'Указан некорректный путь в URL адресе' });
-}
 // Export
 module.exports = {
   getUsers,
@@ -115,5 +116,4 @@ module.exports = {
   createUser,
   updateUser,
   updateAvatar,
-  uncorrectedURL,
 };

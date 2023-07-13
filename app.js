@@ -15,6 +15,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use((req, res, next) => {
   req.user = {
     _id: '64ae1ea9187330db754baef9',
@@ -26,6 +27,10 @@ app.use((req, res, next) => {
 app.use(routeUsers);
 // CARDS:
 app.use(routeCards);
+// Non-existent routes
+app.use('/*', (req, res) => {
+  res.status(404).send({ message: 'Указан некорректный путь в URL адресе' });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);

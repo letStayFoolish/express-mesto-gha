@@ -1,16 +1,19 @@
 const Card = require('../models/card');
+const {
+  BAD_REQUEST,
+  REQUEST_NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} = require('../error_handlers/errors-constantes');
 
 // Read ALL cards
 function getCards(req, res) {
   return Card.find({})
     .then((cards) => {
-      // Status 400:
-
       // Status 200:
-      res.status(200).send(cards);
+      res.send(cards);
     })
     // Status 500 - Default
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}.` }));
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' }));
 }
 
 // Create card
@@ -19,19 +22,17 @@ function createCard(req, res) {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => {
-      // Status 400:
-
       // Status 201:
-      res.status(201).send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         // Status 400:
-        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
         return;
       }
       // Status 500 - Default
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 
@@ -42,18 +43,20 @@ function deleteCard(req, res) {
     .then((card) => {
       // Status 404:
       if (!card) {
-        res.status(404).send({ message: `Карточка с указанным _id: ${cardId} не найдена.` });
+        res.status(REQUEST_NOT_FOUND).send({ message: `Карточка с указанным _id: ${cardId} не найдена.` });
         return;
       }
       // Status 200:
-      res.status(200).send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
+        // Status 400
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для удаления карточки.' });
         return;
       }
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      // Status 500 - Default
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 
@@ -68,7 +71,7 @@ function likeCard(req, res) {
     .then((card) => {
       // Status 404:
       if (!card) {
-        res.status(404).send({ message: `Передан несуществующий _id: ${cardId} карточки` });
+        res.status(REQUEST_NOT_FOUND).send({ message: `Передан несуществующий _id: ${cardId} карточки` });
         return;
       }
       // Status 201:
@@ -77,11 +80,11 @@ function likeCard(req, res) {
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки лайка.' });
         return;
       }
       // Status 500 - Default
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
 
@@ -96,20 +99,20 @@ function dislikeCard(req, res) {
     .then((card) => {
       // Status 404:
       if (!card) {
-        res.status(404).send({ message: `Передан несуществующий _id: ${cardId} карточки` });
+        res.status(REQUEST_NOT_FOUND).send({ message: `Передан несуществующий _id: ${cardId} карточки` });
         return;
       }
-      // Status 201:
-      res.status(200).send(card);
+      // Status 200:
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        res.status(400).send({ message: 'Переданы некорректные данные для снятии лайка.' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для снятии лайка.' });
         return;
       }
       // Status 500 - Default
-      res.status(500).send({ message: `Произошла ошибка ${err}.` });
+      res.status(500).send({ message: 'Произошла ошибка.' });
     });
 }
 module.exports = {
