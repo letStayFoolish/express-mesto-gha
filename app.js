@@ -6,9 +6,8 @@ const PORT = process.env.PORT || 3000;
 
 const routeUsers = require('./routes/users');
 const routeCards = require('./routes/cards');
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-// mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+// old way: mongodb://localhost:27017/mestodb
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
 });
 
