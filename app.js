@@ -25,7 +25,7 @@ const limiter = rateLimit({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(limiter);
-app.use(helmet);
+app.use(helmet());
 app.use((req, res, next) => {
   req.user = {
     _id: '64ae1ea9187330db754baef9',

@@ -1,4 +1,8 @@
+const bcrypt = require('bcrypt');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 const {
   BAD_REQUEST,
   REQUEST_NOT_FOUND,
@@ -13,6 +17,7 @@ function getUsers(req, res) {
     // Status 500 - Default
     .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' }));
 }
+
 // Read ONE user:
 function getUser(req, res) {
   const { userId } = req.params;
@@ -36,12 +41,37 @@ function getUser(req, res) {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
-// Create new user:
+
+// Create new user:return
 function createUser(req, res) {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  if (!req.body) {
+    res.status(BAD_REQUEST).json({ message: 'Неверный основной запрос' });
+    return;
+  }
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  if (!email || !password) {
+    res.status(BAD_REQUEST).json({ message: 'Адрес электронной почты или пароль пусты' });
+    return;
+  }
+  if (!validator.isEmail(email)) {
+    res.status(BAD_REQUEST).json({ message: 'Неверный адрес электронной почты' });
+    return;
+  }
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     // Status 201:
-    .then((user) => res.status(201).send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(INTERNAL_SERVER_ERROR).json({ message: 'Произошла ошибка.' });
+        return;
+      }
+      res.status(201).json(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         // Status 400:
@@ -54,6 +84,39 @@ function createUser(req, res) {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
+
+// Authentication
+function login(req, res) {
+  if (!req.body) {
+    res.status(BAD_REQUEST).json({ message: 'Неверный основной запрос' });
+  }
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(BAD_REQUEST).json({ message: 'Адрес электронной почты или пароль пусты' });
+    return;
+  }
+  if (!validator.isEmail(email)) {
+    res.status(BAD_REQUEST).json({ message: 'Неверный адрес электронной почты' });
+  }
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'text');
+      res.json({ token });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        // Status 400:
+        res.status(BAD_REQUEST).send({
+          message: 'Переданы некорректные данные при логине пользователя.',
+        });
+        return;
+      }
+      // Status 500 - Default
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
+    });
+}
+
 // Update user's info:
 function updateUser(req, res) {
   const uData = {
@@ -82,6 +145,7 @@ function updateUser(req, res) {
       res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
     });
 }
+
 // Update user's avatar:
 function updateAvatar(req, res) {
   const uData = {
@@ -114,6 +178,7 @@ module.exports = {
   getUsers,
   getUser,
   createUser,
+  login,
   updateUser,
   updateAvatar,
 };

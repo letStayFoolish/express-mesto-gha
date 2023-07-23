@@ -1,0 +1,23 @@
+POST http://localhost:3000/users/signin
+Content-Type: application/json
+
+{
+  "email": "irina@email.com",
+  "password": "irina"
+}
+
+###
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "irina",
+  "email": "irina@email.com",
+  "password": "irina"
+}
+
+###
+GET http://localhost:3000/users
+Accept: application/json
+
+###
