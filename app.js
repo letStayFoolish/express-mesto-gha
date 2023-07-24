@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookies = require('cookie-parser');
 
 const PORT = process.env.PORT || 3000;
 const rateLimit = require('express-rate-limit');
@@ -8,6 +9,9 @@ const helmet = require('helmet');
 
 const routeUsers = require('./routes/users');
 const routeCards = require('./routes/cards');
+const routeLogin = require('./routes/login');
+const routeCreateUser = require('./routes/signup');
+const { checkAuthentication } = require('./middlewares/auth');
 // old way: mongodb://localhost:27017/mestodb
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
@@ -24,19 +28,18 @@ const limiter = rateLimit({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookies());
 app.use(limiter);
 app.use(helmet());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64ae1ea9187330db754baef9',
-  };
-  next();
-});
 
 // USERS:
-app.use(routeUsers);
+app.use(checkAuthentication, routeUsers);
 // CARDS:
-app.use(routeCards);
+app.use(checkAuthentication, routeCards);
+// LOGIN:
+app.use(routeLogin);
+// SIGNUP:
+app.use(routeCreateUser);
 // Non-existent routes
 app.use('/*', (req, res) => {
   res.status(404).send({ message: 'Указан некорректный путь в URL адресе' });

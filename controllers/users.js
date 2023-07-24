@@ -1,13 +1,14 @@
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const {
   BAD_REQUEST,
+  BAD_UNAUTHORIZED,
   REQUEST_NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require('../error_handlers/errors-constantes');
+const { generateToken } = require('../utils/token');
 
 // Read ALL users:
 function getUsers(req, res) {
@@ -30,6 +31,35 @@ function getUser(req, res) {
       }
       // Status 200:
       res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        // Status 400:
+        res.status(BAD_REQUEST).send({ message: 'Указан некорректный id.' });
+        return;
+      }
+      // Status 500 - Default:
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
+    });
+}
+
+// Get Current User:
+function getCurrentUser(req, res) {
+  const userId = req.user._id;
+  return User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        // Status 404:
+        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден..` });
+        return;
+      }
+      // Status 200:
+      res.json({
+        name: user.name,
+        about: user.about,
+        email: user.email,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -99,21 +129,17 @@ function login(req, res) {
   if (!validator.isEmail(email)) {
     res.status(BAD_REQUEST).json({ message: 'Неверный адрес электронной почты' });
   }
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'text');
+      const token = generateToken({ _id: user._id }); // PAYLOAD { _id: user._id }
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+      });
       res.json({ token });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        // Status 400:
-        res.status(BAD_REQUEST).send({
-          message: 'Переданы некорректные данные при логине пользователя.',
-        });
-        return;
-      }
-      // Status 500 - Default
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
+      res.status(BAD_UNAUTHORIZED).json({ message: err.message });
     });
 }
 
@@ -177,6 +203,7 @@ function updateAvatar(req, res) {
 module.exports = {
   getUsers,
   getUser,
+  getCurrentUser,
   createUser,
   login,
   updateUser,

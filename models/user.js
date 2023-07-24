@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { BAD_REQUEST } = require('../error_handlers/errors-constantes');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -41,6 +40,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
           if (!matched) {
             return Promise.reject(new Error('Неправильные почта или пароль'));
           }
+
           return user;
         });
     });
