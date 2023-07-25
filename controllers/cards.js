@@ -28,9 +28,9 @@ function createCard(req, res, next) {
         // Status 400
         return next(new BadRequest('Переданы некорректные данные при создании карточки.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Delete card
@@ -58,9 +58,9 @@ function deleteCard(req, res, next) {
         // Status 400
         return next(new BadRequest('Переданы некорректные данные для удаления карточки.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Put likes
@@ -84,9 +84,9 @@ function likeCard(req, res, next) {
         // Status 400:
         return next(new BadRequest('Переданы некорректные данные для постановки лайка.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Delete likes
@@ -110,9 +110,9 @@ function dislikeCard(req, res, next) {
         // Status 400:
         return next(new BadRequest('Переданы некорректные данные для снятии лайка.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 module.exports = {
   getCards,

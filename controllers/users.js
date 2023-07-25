@@ -31,9 +31,9 @@ function getUser(req, res, next) {
         // Status 400:
         return next(new BadRequest('Указан некорректный id.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Get Current User:
@@ -53,9 +53,9 @@ function getCurrentUser(req, res, next) {
         // Status 400:
         return next(new BadRequest('Указан некорректный id.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Create new user:
@@ -84,9 +84,9 @@ function createUser(req, res, next) {
         // Status 400:
         return next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Authentication
@@ -133,9 +133,9 @@ function updateUser(req, res, next) {
       if (err.name === 'ValidationError') {
         return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Update user's avatar:
@@ -157,9 +157,9 @@ function updateAvatar(req, res, next) {
       if (err.name === 'ValidationError') {
         return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
-    })
-    // Status 500 - Default
-    .catch(next);
+      // Status 500 - Default
+      return next(err);
+    });
 }
 
 // Export
