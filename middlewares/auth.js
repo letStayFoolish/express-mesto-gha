@@ -7,8 +7,9 @@ const checkAuthentication = (req, res, next) => {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
   let payload;
+  const token = req.cookies.jwt;
   try {
-    payload = checkToken(jwt);
+    payload = checkToken(token);
   } catch (error) {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
