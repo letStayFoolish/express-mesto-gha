@@ -3,12 +3,13 @@ const BadRequest = require('../error_handlers/bad-request-400');
 
 const checkAuthentication = (req, res, next) => {
   const { jwt } = req.cookies;
+  const { token } = jwt;
   if (!jwt) {
     return next(new BadRequest('Доступ запрещен.'));
   }
   let payload;
   try {
-    payload = checkToken(jwt);
+    payload = checkToken(token);
   } catch (error) {
     return next(new BadRequest('Необходима авторизация.'));
   }
