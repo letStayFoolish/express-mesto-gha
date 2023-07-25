@@ -1,22 +1,22 @@
 const { checkToken } = require('../utils/token');
-
-const {
-  BAD_UNAUTHORIZED,
-} = require('../error_handlers/errors-constantes');
+const BadRequest = require('../error_handlers/bad-request-400');
 
 const checkAuthentication = (req, res, next) => {
-  if (!req.cookies) {
-    return res.status(BAD_UNAUTHORIZED).json({ message: 'Доступ запрещен.' });
+  const { jwt } = req.cookies;
+  if (!jwt) {
+    return next(new BadRequest('Доступ запрещен.'));
   }
   let payload;
-  const token = req.cookies.jwt;
   try {
-    payload = checkToken(token);
+    payload = checkToken(jwt);
   } catch (error) {
-    return res.status(BAD_UNAUTHORIZED).json({ message: 'Необходима авторизация.' });
+    return next(new BadRequest('Необходима авторизация.'));
   }
-  req.user = payload;
-  next();
+  // req.user = payload;
+  req.user = {
+    _id: payload._id,
+  };
+  return next();
 };
 
 module.exports = { checkAuthentication };
