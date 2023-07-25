@@ -7,9 +7,8 @@ const checkAuthentication = (req, res, next) => {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
   let payload;
-  const token = req.cookies.jwt;
   try {
-    payload = checkToken(token);
+    payload = checkToken(jwt);
   } catch (error) {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
@@ -17,4 +16,4 @@ const checkAuthentication = (req, res, next) => {
   return next();
 };
 
-module.exports = { checkAuthentication };
+module.exports = checkAuthentication;
