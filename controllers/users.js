@@ -13,7 +13,7 @@ function getUsers(req, res, next) {
     .then((user) => {
       if (!user) {
         // Status 401:
-        throw new RequestUnauthorized('Недостаточно прав для просмотра пользователей.');
+        throw next(new RequestUnauthorized('Недостаточно прав для просмотра пользователей.'));
       }
       // Status 200:
       res.send(user);
@@ -29,12 +29,13 @@ function getUser(req, res, next) {
     .then((user) => {
       if (!user) {
         // Status 404:
-        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
+        throw next(new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`));
       }
       // Status 200:
-      res.send(user);
+      res.json(user);
     })
     .catch((err) => {
+      console.log(`Err: ${err}`);
       if (err.name === 'CastError') {
         // Status 400:
         return next(new BadRequest('Указан некорректный id.'));
@@ -51,7 +52,7 @@ function getCurrentUser(req, res, next) {
     .then((user) => {
       if (!user) {
         // Status 404:
-        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
+        throw next(new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`));
       }
       // Status 200:
       res.json(user);
@@ -76,14 +77,16 @@ function createUser(req, res, next) {
   } = req.body;
 
   if (!email || !password) {
-    throw new BadRequest('Адрес электронной почты или пароль пусты');
+    throw next(new BadRequest('Адрес электронной почты или пароль пусты'));
   }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     // Status 201:
-    .then((user) => res.status(201).json(user))
+    .then((user) => res.status(201).json({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         return next(new RequestConflict('Пользователь с таким емайлом уже существует'));
@@ -100,15 +103,18 @@ function createUser(req, res, next) {
 // Authentication
 function login(req, res, next) {
   if (Object.keys(req.body).length === 0) {
-    throw new BadRequest('Неверный основной запрос');
+    throw next(new BadRequest('Неверный основной запрос'));
   }
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new BadRequest('Адрес электронной почты или пароль пусты');
+    throw next(new BadRequest('Адрес электронной почты или пароль пусты'));
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      if (!user) {
+        throw next(new RequestUnauthorized('Пользователь с таким емайлом не существует в БД'));
+      }
       const token = generateToken({ _id: user._id }); // PAYLOAD { _id: user._id }
       res.cookie('jwt', token, {
         httpOnly: true,
@@ -131,7 +137,7 @@ function updateUser(req, res, next) {
     .then((user) => {
       // Status 404
       if (!user) {
-        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
+        throw next(new NotFoundError(`Пользователь с указанным id: ${id} не найден.`));
       }
       // Status 200:
       res.send(user);
@@ -156,7 +162,7 @@ function updateAvatar(req, res, next) {
     .then((user) => {
       // Status 404
       if (!user) {
-        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
+        throw next(new NotFoundError(`Пользователь с указанным id: ${id} не найден.`));
       }
       res.send(user);
     })
