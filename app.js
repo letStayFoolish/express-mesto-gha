@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
+const { errors } = require('celebrate');
 
 const PORT = process.env.PORT || 3000;
 const rateLimit = require('express-rate-limit');
@@ -43,6 +44,12 @@ app.use(routeCreateUser);
 // Non-existent routes
 app.use('/*', (req, res) => {
   res.status(404).send({ message: 'Указан некорректный путь в URL адресе' });
+});
+app.use(errors());
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка.' : message });
 });
 
 app.listen(PORT, () => {

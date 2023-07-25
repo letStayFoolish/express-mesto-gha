@@ -1,33 +1,27 @@
 const bcrypt = require('bcrypt');
-const validator = require('validator');
 const User = require('../models/user');
-
-const {
-  BAD_REQUEST,
-  BAD_UNAUTHORIZED,
-  REQUEST_NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-} = require('../error_handlers/errors-constantes');
 const { generateToken } = require('../utils/token');
+const NotFoundError = require('../error_handlers/not-found-error');
+const BadRequest = require('../error_handlers/bad-request-400');
+const RequestConflict = require('../error_handlers/request-conflict-409');
 
 // Read ALL users:
-function getUsers(req, res) {
+function getUsers(req, res, next) {
   return User.find({})
     // Status 200:
     .then((users) => res.send(users))
     // Status 500 - Default
-    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' }));
+    .catch(next);
 }
 
 // Read ONE user:
-function getUser(req, res) {
+function getUser(req, res, next) {
   const { userId } = req.params;
   return User.findById(userId)
     .then((user) => {
       if (!user) {
         // Status 404:
-        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден..` });
-        return;
+        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
       }
       // Status 200:
       res.send(user);
@@ -35,99 +29,75 @@ function getUser(req, res) {
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        res.status(BAD_REQUEST).send({ message: 'Указан некорректный id.' });
-        return;
+        return next(new BadRequest('Указан некорректный id.'));
       }
-      // Status 500 - Default:
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
-    });
+    })
+    // Status 500 - Default
+    .catch(next);
 }
 
 // Get Current User:
-function getCurrentUser(req, res) {
+function getCurrentUser(req, res, next) {
   const userId = req.user._id;
   return User.findById(userId)
     .then((user) => {
       if (!user) {
         // Status 404:
-        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь по указанному id: ${userId} не найден..` });
-        return;
+        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
       }
       // Status 200:
-      res.json({
-        name: user.name,
-        about: user.about,
-        email: user.email,
-        avatar: user.avatar,
-      });
+      res.json(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        res.status(BAD_REQUEST).send({ message: 'Указан некорректный id.' });
-        return;
+        return next(new BadRequest('Указан некорректный id.'));
       }
-      // Status 500 - Default:
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
-    });
+    })
+    // Status 500 - Default
+    .catch(next);
 }
 
-// Create new user:return
-function createUser(req, res) {
-  if (!req.body) {
-    res.status(BAD_REQUEST).json({ message: 'Неверный основной запрос' });
-    return;
+// Create new user:
+function createUser(req, res, next) {
+  if (Object.keys(req.body).length === 0) {
+    throw new BadRequest('Неверный основной запрос');
   }
   const {
     name, about, avatar, email, password,
   } = req.body;
 
   if (!email || !password) {
-    res.status(BAD_REQUEST).json({ message: 'Адрес электронной почты или пароль пусты' });
-    return;
-  }
-  if (!validator.isEmail(email)) {
-    res.status(BAD_REQUEST).json({ message: 'Неверный адрес электронной почты' });
-    return;
+    throw new BadRequest('Адрес электронной почты или пароль пусты');
   }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     // Status 201:
-    .then((user) => {
-      if (!user) {
-        res.status(INTERNAL_SERVER_ERROR).json({ message: 'Произошла ошибка.' });
-        return;
-      }
-      res.status(201).json(user);
-    })
+    .then((user) => res.status(201).json(user))
     .catch((err) => {
+      if (err.code === 11000) {
+        return next(new RequestConflict('Пользователь с таким емайлом уже существует'));
+      }
       if (err.name === 'ValidationError') {
         // Status 400:
-        res.status(BAD_REQUEST).send({
-          message: 'Переданы некорректные данные при создании пользователя.',
-        });
-        return;
+        return next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
       }
-      // Status 500 - Default
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
-    });
+    })
+    // Status 500 - Default
+    .catch(next);
 }
 
 // Authentication
-function login(req, res) {
-  if (!req.body) {
-    res.status(BAD_REQUEST).json({ message: 'Неверный основной запрос' });
+function login(req, res, next) {
+  if (Object.keys(req.body).length === 0) {
+    throw new BadRequest('Неверный основной запрос');
   }
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(BAD_REQUEST).json({ message: 'Адрес электронной почты или пароль пусты' });
-    return;
-  }
-  if (!validator.isEmail(email)) {
-    res.status(BAD_REQUEST).json({ message: 'Неверный адрес электронной почты' });
+    throw new BadRequest('Адрес электронной почты или пароль пусты');
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -138,13 +108,12 @@ function login(req, res) {
       });
       res.json({ token });
     })
-    .catch((err) => {
-      res.status(BAD_UNAUTHORIZED).json({ message: err.message });
-    });
+    // Status 500 - Default
+    .catch(next);
 }
 
 // Update user's info:
-function updateUser(req, res) {
+function updateUser(req, res, next) {
   const uData = {
     name: req.body.name,
     about: req.body.about,
@@ -154,8 +123,7 @@ function updateUser(req, res) {
     .then((user) => {
       // Status 404
       if (!user) {
-        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь с указанным id: ${id} не найден.` });
-        return;
+        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
       }
       // Status 200:
       res.send(user);
@@ -163,17 +131,15 @@ function updateUser(req, res) {
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-        return;
+        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
-      // Status 500 - Default:
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
-    });
+    })
+    // Status 500 - Default
+    .catch(next);
 }
 
 // Update user's avatar:
-function updateAvatar(req, res) {
+function updateAvatar(req, res, next) {
   const uData = {
     avatar: req.body.avatar,
   };
@@ -182,21 +148,18 @@ function updateAvatar(req, res) {
     .then((user) => {
       // Status 404
       if (!user) {
-        res.status(REQUEST_NOT_FOUND).send({ message: `Пользователь с указанным id: ${id} не найден.` });
-        return;
+        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
       }
       res.send(user);
     })
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-        return;
+        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
-      // Status 500 - Default:
-      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка.' });
-    });
+    })
+    // Status 500 - Default
+    .catch(next);
 }
 
 // Export

@@ -1,0 +1,48 @@
+GET http://localhost:3000/users/me
+Accept: application/json
+
+###
+POST http://localhost:3000/signin
+Content-Type: application/json
+
+{
+  "email": "chiliue@email.com",
+  "password": "chili"
+}
+
+###
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+  "name": "Nemanja",
+  "email": "fff",
+  "password": "sasha123456"
+}
+
+###
+GET http://localhost:3000/users
+Accept: application/json
+
+###
+GET http://localhost:3000/users/64bd6648392610d70b9f1c8e
+Accept: application/json
+
+###
+PATCH http://localhost:3000/users/me
+Content-Type: application/json
+
+{
+  "name": "Chili-Code",
+  "about": "learner"
+}
+
+###
+PATCH http://localhost:3000/users/me/avatar
+Content-Type: application/json
+
+{
+  "avatar": "https://images.unsplash.com/photo-1690184427947-c6cb23c64320?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxOHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=60"
+}
+
+###
