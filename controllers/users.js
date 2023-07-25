@@ -35,7 +35,6 @@ function getUser(req, res, next) {
       res.json(user);
     })
     .catch((err) => {
-      console.log(`Err: ${err}`);
       if (err.name === 'CastError') {
         // Status 400:
         return next(new BadRequest('Указан некорректный id.'));

@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
 const { errors } = require('celebrate');
@@ -20,17 +19,16 @@ mongoose.connect(DB_ADDRESS, {
 
 const app = express();
 app.use(helmet());
-app.use(cors());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
-app.use(limiter);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 app.use(cookies());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(limiter);
 
 // USERS:
 app.use(checkAuthentication, routeUsers);
@@ -46,9 +44,11 @@ app.use('/*', (req, res) => {
 });
 app.use(errors());
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка.' : message });
+
+  return next();
 });
 
 app.listen(PORT, () => {
