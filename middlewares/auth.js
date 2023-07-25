@@ -2,15 +2,15 @@ const { checkToken } = require('../utils/token');
 const RequestUnauthorized = require('../error_handlers/request-unauthorized-401');
 
 const checkAuthentication = (req, res, next) => {
-  const { authorization } = req.cookies;
+  const { jwt } = req.cookies;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!jwt || !jwt.startsWith('Bearer ')) {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
-  const token = authorization.replace('Bearer ', '');
+  // const token = jwt.replace('Bearer ', '');
   let payload;
   try {
-    payload = checkToken(token);
+    payload = checkToken(jwt);
   } catch (error) {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
@@ -18,4 +18,4 @@ const checkAuthentication = (req, res, next) => {
   return next();
 };
 
-module.exports = { checkAuthentication };
+module.exports = checkAuthentication;

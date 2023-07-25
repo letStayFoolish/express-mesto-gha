@@ -11,7 +11,7 @@ const routeUsers = require('./routes/users');
 const routeCards = require('./routes/cards');
 const routeLogin = require('./routes/login');
 const routeCreateUser = require('./routes/signup');
-const { checkAuthentication } = require('./middlewares/auth');
+const checkAuthentication = require('./middlewares/auth');
 // old way: mongodb://localhost:27017/mestodb
 mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
