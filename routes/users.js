@@ -9,7 +9,7 @@ router.get('/users', getUsers); // Read ALL users
 router.get('/users/me', getCurrentUser); // Read Current user
 router.get('/users/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().length(30).hex().required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
 }), getUser); // Read ONE user
 router.patch('/users/me', celebrate({

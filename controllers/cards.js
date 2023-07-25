@@ -49,7 +49,7 @@ function deleteCard(req, res, next) {
 
       Card.findByIdAndDelete(cardId)
         // Status 200:
-        .then((result) => res.send(result))
+        .then((result) => res.json(result))
         // Status 500 - Default
         .catch(next);
     })

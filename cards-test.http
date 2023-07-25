@@ -2,8 +2,8 @@ POST http://localhost:3000/cards
 Content-Type: application/json
 
 {
-  "link": "https://images.unsplash.com/photo-1690061522224-97144ee72462?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxNHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=6",
-  "name": "picture-6"
+  "link": "https://images.unsplash.com/photo-1690081598908-be45683775f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
+  "name": "test-pic-01"
 }
 
 ###
@@ -11,7 +11,7 @@ GET http://localhost:3000/cards/
 Accept: application/json
 
 ###
-DELETE http://localhost:3000/cards/64bfafecb615fc928ffac06g
+DELETE http://localhost:3000/cards/64bfafcab615fc928ffac063
 Accept: application/json
 
 ###

@@ -4,12 +4,20 @@ const { generateToken } = require('../utils/token');
 const NotFoundError = require('../error_handlers/not-found-error');
 const BadRequest = require('../error_handlers/bad-request-400');
 const RequestConflict = require('../error_handlers/request-conflict-409');
+const RequestUnauthorized = require('../error_handlers/request-unauthorized-401');
 
 // Read ALL users:
 function getUsers(req, res, next) {
   return User.find({})
     // Status 200:
-    .then((users) => res.send(users))
+    .then((user) => {
+      if (!user) {
+        // Status 401:
+        throw new RequestUnauthorized('Недостаточно прав для просмотра пользователей.');
+      }
+      // Status 200:
+      res.send(user);
+    })
     // Status 500 - Default
     .catch(next);
 }
