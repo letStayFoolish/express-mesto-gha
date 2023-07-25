@@ -3,11 +3,9 @@ const RequestUnauthorized = require('../error_handlers/request-unauthorized-401'
 
 const checkAuthentication = (req, res, next) => {
   const { jwt } = req.cookies;
-
-  if (!jwt || !jwt.startsWith('Bearer ')) {
+  if (!req.cookies) {
     return next(new RequestUnauthorized('Необходима авторизация.'));
   }
-  // const token = jwt.replace('Bearer ', '');
   let payload;
   try {
     payload = checkToken(jwt);
@@ -18,4 +16,4 @@ const checkAuthentication = (req, res, next) => {
   return next();
 };
 
-module.exports = checkAuthentication;
+module.exports = { checkAuthentication };
