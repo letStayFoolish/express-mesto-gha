@@ -15,9 +15,11 @@ POST http://localhost:3000/signup
 Content-Type: application/json
 
 {
-  "name": "Test",
-  "email": "test@test.com",
-  "password": "test123"
+  "email": "Philip_Stehr47@hotmail.com",
+  "password": "longPass",
+  "name": "m",
+  "about": "about",
+  "avatar": "https://ya.ru/av.bmp"
 }
 
 ###

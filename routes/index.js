@@ -7,7 +7,6 @@ const signupRoutes = require('./signup');
 const signoutRoutes = require('./signout');
 const loginRoutes = require('./login');
 const checkAuthentication = require('../middlewares/auth');
-const errorsHandlers = require('../middlewares/errorsHandler');
 // Before homepage login or sign-up:
 router.use('/', loginRoutes);
 router.use('/', signupRoutes);
@@ -20,6 +19,4 @@ router.use('/users', usersRoutes);
 router.use('/', signoutRoutes);
 // Non-existent routes
 router.use('/*', (req, res, next) => next(new NotFoundError('Указан некорректный путь в URL адресе')));
-router.use(errorsHandlers);
-
 module.exports = router;

@@ -5,6 +5,7 @@ const {
   createUser,
 } = require('../controllers/users');
 
+// Signup
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -13,6 +14,6 @@ router.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(URL_REGEX),
   }),
-}), createUser); // Signup
+}), createUser);
 
 module.exports = router;

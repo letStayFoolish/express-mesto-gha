@@ -7,6 +7,7 @@ const { errors } = require('celebrate');
 const { PORT, DB_ADDRESS } = require('./config');
 const routes = require('./routes/index');
 const limiter = require('./utils/limiter');
+const errorsHandlers = require('./middlewares/errorsHandler');
 // old way: mongodb://localhost:27017/mestodb
 mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
@@ -20,6 +21,7 @@ app.use(limiter);
 // Access to all routes:
 app.use(routes);
 app.use(errors());
+app.use(errorsHandlers);
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);
 });
