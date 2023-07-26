@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookies = require('cookie-parser');
 const helmet = require('helmet');
+const { errors } = require('celebrate');
 const { PORT, DB_ADDRESS } = require('./config');
 const routes = require('./routes/index');
 const limiter = require('./utils/limiter');
@@ -18,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(limiter);
 // Access to all routes:
 app.use(routes);
-
+app.use(errors());
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);
 });

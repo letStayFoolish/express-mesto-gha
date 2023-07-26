@@ -25,7 +25,7 @@ GET http://localhost:3000/users
 Accept: application/json
 
 ###
-GET http://localhost:3000/users/61eade4c6d5acf558c42d9b8
+GET http://localhost:3000/users/64c00536a30521f72168330
 Accept: application/json
 
 ###

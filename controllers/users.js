@@ -55,7 +55,7 @@ function getCurrentUser(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        return new BadRequest('Указан некорректный id.');
+        return next(new BadRequest('Указан некорректный id.'));
       }
       // Status 500 - Default
       return next(err);
@@ -78,11 +78,11 @@ function createUser(req, res, next) {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        return new RequestConflict('Пользователь с таким емайлом уже существует');
+        return next(new RequestConflict('Пользователь с таким емайлом уже существует'));
       }
       if (err.name === 'ValidationError') {
         // Status 400:
-        return new BadRequest('Переданы некорректные данные при создании пользователя.');
+        return next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
       }
       // Status 500 - Default
       return next(err);
@@ -129,7 +129,7 @@ function updateUser(req, res, next) {
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        return new BadRequest('Переданы некорректные данные при обновлении профиля.');
+        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
       // Status 500 - Default
       return next(err);
@@ -153,7 +153,7 @@ function updateAvatar(req, res, next) {
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        return new BadRequest('Переданы некорректные данные при обновлении профиля.');
+        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
       }
       // Status 500 - Default
       return next(err);
