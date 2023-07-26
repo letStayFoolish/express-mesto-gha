@@ -11,10 +11,6 @@ function getUsers(req, res, next) {
   return User.find({})
     // Status 200:
     .then((user) => {
-      if (!user) {
-        // Status 401:
-        throw next(new RequestUnauthorized('Недостаточно прав для просмотра пользователей.'));
-      }
       // Status 200:
       res.send(user);
     })
@@ -29,7 +25,7 @@ function getUser(req, res, next) {
     .then((user) => {
       if (!user) {
         // Status 404:
-        throw next(new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`));
+        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
       }
       // Status 200:
       res.json(user);
@@ -51,7 +47,7 @@ function getCurrentUser(req, res, next) {
     .then((user) => {
       if (!user) {
         // Status 404:
-        throw next(new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`));
+        throw new NotFoundError(`Пользователь по указанному id: ${userId} не найден.`);
       }
       // Status 200:
       res.json(user);
@@ -59,7 +55,7 @@ function getCurrentUser(req, res, next) {
     .catch((err) => {
       if (err.name === 'CastError') {
         // Status 400:
-        return next(new BadRequest('Указан некорректный id.'));
+        return new BadRequest('Указан некорректный id.');
       }
       // Status 500 - Default
       return next(err);
@@ -68,16 +64,10 @@ function getCurrentUser(req, res, next) {
 
 // Create new user:
 function createUser(req, res, next) {
-  if (Object.keys(req.body).length === 0) {
-    throw new BadRequest('Неверный основной запрос');
-  }
   const {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (!email || !password) {
-    throw next(new BadRequest('Адрес электронной почты или пароль пусты'));
-  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -88,11 +78,11 @@ function createUser(req, res, next) {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new RequestConflict('Пользователь с таким емайлом уже существует'));
+        return new RequestConflict('Пользователь с таким емайлом уже существует');
       }
       if (err.name === 'ValidationError') {
         // Status 400:
-        return next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
+        return new BadRequest('Переданы некорректные данные при создании пользователя.');
       }
       // Status 500 - Default
       return next(err);
@@ -101,18 +91,12 @@ function createUser(req, res, next) {
 
 // Authentication
 function login(req, res, next) {
-  if (Object.keys(req.body).length === 0) {
-    throw next(new BadRequest('Неверный основной запрос'));
-  }
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw next(new BadRequest('Адрес электронной почты или пароль пусты'));
-  }
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw next(new RequestUnauthorized('Пользователь с таким емайлом не существует в БД'));
+        throw new RequestUnauthorized('Пользователь с таким емайлом не существует в БД');
       }
       const token = generateToken({ _id: user._id }); // PAYLOAD { _id: user._id }
       res.cookie('jwt', token, {
@@ -137,7 +121,7 @@ function updateUser(req, res, next) {
     .then((user) => {
       // Status 404
       if (!user) {
-        throw next(new NotFoundError(`Пользователь с указанным id: ${id} не найден.`));
+        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
       }
       // Status 200:
       res.send(user);
@@ -145,7 +129,7 @@ function updateUser(req, res, next) {
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
+        return new BadRequest('Переданы некорректные данные при обновлении профиля.');
       }
       // Status 500 - Default
       return next(err);
@@ -162,14 +146,14 @@ function updateAvatar(req, res, next) {
     .then((user) => {
       // Status 404
       if (!user) {
-        throw next(new NotFoundError(`Пользователь с указанным id: ${id} не найден.`));
+        throw new NotFoundError(`Пользователь с указанным id: ${id} не найден.`);
       }
       res.send(user);
     })
     .catch((err) => {
       // Status 400:
       if (err.name === 'ValidationError') {
-        return next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
+        return new BadRequest('Переданы некорректные данные при обновлении профиля.');
       }
       // Status 500 - Default
       return next(err);

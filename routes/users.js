@@ -5,23 +5,28 @@ const {
   getUsers, getUser, getCurrentUser, updateUser, updateAvatar,
 } = require('../controllers/users');
 
-router.get('/users', getUsers); // Read ALL users
-router.get('/users/me', getCurrentUser); // Read Current user
-router.get('/users/:userId', celebrate({
+// Read ALL users
+router.get('/', getUsers);
+// Read Current user
+router.get('/me', getCurrentUser);
+// Read ONE user
+router.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().length(24).hex().required(),
   }),
-}), getUser); // Read ONE user
-router.patch('/users/me', celebrate({
+}), getUser);
+// Update user's info
+router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),
-}), updateUser); // Update user's info
-router.patch('/users/me/avatar', celebrate({
+}), updateUser);
+// Update user's avatar
+router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().pattern(URL_REGEX),
   }),
-}), updateAvatar); // Update user's avatar
+}), updateAvatar);
 
 module.exports = router;
